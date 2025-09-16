@@ -1,103 +1,88 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { Calendar, IndianRupee, Handshake } from "lucide-react";
+import car from "../../public/image.jpg";
+import drive from "../../public/whyDriveWithUs_desktop.svg";
+
+
 
 export default function Home() {
+ 
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen w-full bg-black">
+      {/* navbar */}
+      <div className="bg-white sticky top-0 w-full z-10">
+        <div className="flex h-12 justify-between items-center max-w-6xl px-5 sm:px-10 mx-auto">
+          <div className="text-black font-semibold text-2xl">kanthan</div>
+          <div className="flex flex-row items-center gap-4">
+            <Link href="/help">Help</Link>
+            <Link href="/login">Log in</Link>
+            <Link
+              href="/auth/signup"
+              className="bg-black text-white py-1 px-2 rounded-4xl"
+            >
+              Sign up
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* hero */}
+      <div className="py-10 px-5 md:px-10 bg-white">
+        <div className="flex lg:flex-row flex-col justify-between items-center max-w-5xl mx-auto">
+          <div className="flex flex-col gap-6">
+            <h1 className="text-3xl sm:text-5xl font-semibold">
+              Drive when you want, make what you need
+            </h1>
+            <h2 className="text-lg">Earn on your own schedule</h2>
+            <div className="flex gap-6">
+              <Link
+                href="#"
+                className="bg-black rounded-lg text-white py-2 px-5"
+              >
+                Get started
+              </Link>
+              <Link href="/auth/login" className="underline underline-offset-4">
+                Already have an account? Sign in
+              </Link>
+            </div>
+          </div>
+          <Image src={car} alt="" className="h-auto lg:w-140" />
+        </div>
+      </div>
+
+      {/* why drive */}
+      <div className="max-w-5xl px-5 mx-auto text-white flex flex-col gap-y-10 py-20">
+        <h1 className="font-semibold text-3xl">Why drive with us</h1>
+        <div className="flex justify-center">
+          <Image src={drive} alt="" />
+        </div>
+        <div className="flex flex-col md:flex-row gap-10">
+          <div className="flex flex-col border gap-y-5 w-full md:w-1/3 border-white/30 p-3 rounded-lg">
+            <Calendar />
+            <h1>Set your own hours</h1>
+            <h2>You decide when and how often you drive.</h2>
+          </div>
+          <div className="flex flex-col border gap-y-5 w-full md:w-1/3 border-white/30 p-3 rounded-lg">
+            <IndianRupee />
+            <h1>Get paid fast</h1>
+            <h2>Weekly payments in your bank account.</h2>
+          </div>
+          <div className="flex flex-col border gap-y-5 w-full md:w-1/3 border-white/30 p-3 rounded-lg">
+            <Handshake />
+            <h1>Get support at every turn</h1>
+            <h2>If there’s anything you need, you can reach us anytime.</h2>
+          </div>
+        </div>
+      </div>
+      
+
+      <div >
+
+      </div>
+  
     </div>
   );
 }
