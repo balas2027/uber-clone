@@ -162,19 +162,29 @@
 //   )
 // }
 
-
+// app/driver/login/page.js
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { login, signup, loginWithGoogle } from './actions'
+// app/driver/login/page.js
+import { driverLogin, driverSignup } from './actions'
 
-export default async function LoginPage({ searchParams }) {
+
+
+export default async function DriverLoginPage({ searchParams }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
+  // If already logged in, check if driver and redirect accordingly
   if (user) {
-    redirect('/profile')
+    const { data: driverProfile } = await supabase
+      .from('driver_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (driverProfile) {
+      redirect('/driver/dashboard')
+    }
   }
 
   const error = searchParams?.error
@@ -182,181 +192,196 @@ export default async function LoginPage({ searchParams }) {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fade-in">
+        {/* Error/Message Alerts */}
         {error && (
-          <div className="bg-white text-black px-4 py-3 rounded mb-6 text-center font-medium">
+          <div className="bg-white text-black px-4 py-3 rounded-lg mb-6 text-center font-semibold animate-slide-down shadow-lg">
             {error}
           </div>
         )}
 
         {message && (
-          <div className="bg-white text-black px-4 py-3 rounded mb-6 text-center font-medium">
+          <div className="bg-white text-black px-4 py-3 rounded-lg mb-6 text-center font-semibold animate-slide-down shadow-lg">
             {message}
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-105">
+          {/* Header with Icon */}
+          <div className="bg-black text-white p-8 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shimmer"></div>
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 transform transition-transform duration-300 hover:rotate-12">
+              <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+              </svg>
+            </div>
+            <h1 className="text-4xl font-bold mb-2 animate-pulse-text">Driver Portal</h1>
+            <p className="text-gray-300">Sign in to start driving</p>
+          </div>
+
           {/* Toggle Tabs */}
           <div className="flex bg-gray-100 relative">
-            <input type="radio" id="login-tab" name="auth-tab" className="hidden peer/login" defaultChecked />
-            <input type="radio" id="register-tab" name="auth-tab" className="hidden peer/register" />
+            <input type="radio" id="driver-login-tab" name="driver-auth-tab" className="hidden peer/login" defaultChecked />
+            <input type="radio" id="driver-register-tab" name="driver-auth-tab" className="hidden peer/register" />
             
             <label 
-              htmlFor="login-tab" 
-              className="flex-1 py-4 text-center font-semibold cursor-pointer transition-colors duration-300 peer-checked/login:text-black text-gray-600 relative z-10"
+              htmlFor="driver-login-tab" 
+              className="flex-1 py-4 text-center font-bold cursor-pointer transition-all duration-300 peer-checked/login:text-black text-gray-600 relative z-10 hover:scale-105"
             >
               Sign In
             </label>
             
             <label 
-              htmlFor="register-tab" 
-              className="flex-1 py-4 text-center font-semibold cursor-pointer transition-colors duration-300 peer-checked/register:text-black text-gray-600 relative z-10"
+              htmlFor="driver-register-tab" 
+              className="flex-1 py-4 text-center font-bold cursor-pointer transition-all duration-300 peer-checked/register:text-black text-gray-600 relative z-10 hover:scale-105"
             >
-              Sign Up
+              Register
             </label>
             
-            {/* Sliding indicator */}
-            <div className="absolute top-0 left-0 w-1/2 h-full bg-white transition-transform duration-300 peer-checked/register:translate-x-full"></div>
+            {/* Sliding indicator with glow effect */}
+            <div className="absolute top-0 left-0 w-1/2 h-full bg-black transition-transform duration-500 ease-out peer-checked/register:translate-x-full shadow-lg"></div>
           </div>
 
           <div className="p-8 text-black">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Welcome</h1>
-              <p className="text-gray-600">Access your account</p>
-            </div>
-
             {/* Login Form */}
-            <div className="peer-checked/register:hidden">
-              <form action={login} className="space-y-6">
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  required
-                  className="w-full px-4 py-3 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
-                />
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  required
-                  className="w-full px-4 py-3 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
-                />
+            <div className="peer-checked/register:hidden animate-fade-in">
+              <form action={driverLogin} className="space-y-6">
+                <div className="space-y-4">
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Driver Email"
+                    required
+                    className="w-full px-6 py-4 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    required
+                    className="w-full px-6 py-4 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                </div>
                 <button
                   type="submit"
-                  className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                  className="w-full bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl active:scale-95"
                 >
-                  Sign In
-                </button>
-              </form>
-
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-3 text-gray-600">Or continue with</span>
-                </div>
-              </div>
-
-              <form action={loginWithGoogle}>
-                <button
-                  type="submit"
-                  className="w-full border-2 border-black text-black font-semibold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  <span>Continue with Google</span>
+                  Sign In as Driver
                 </button>
               </form>
             </div>
 
             {/* Register Form */}
-            <div className="peer-checked/login:hidden">
-              <form action={signup} className="space-y-6">
-                <input
-                  name="username"
-                  type="text"
-                  placeholder="Username (optional)"
-                  className="w-full px-4 py-3 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
-                />
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  required
-                  className="w-full px-4 py-3 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
-                />
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  required
-                  className="w-full px-4 py-3 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
-                />
+            <div className="peer-checked/login:hidden animate-fade-in">
+              <form action={driverSignup} className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <input
+                    name="fullName"
+                    type="text"
+                    placeholder="Full Name"
+                    required
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    required
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    required
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="phone"
+                    type="tel"
+                    placeholder="Phone Number"
+                    required
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="licenseNumber"
+                    type="text"
+                    placeholder="Driver's License Number"
+                    required
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="vehicleModel"
+                    type="text"
+                    placeholder="Vehicle Model (e.g., Honda City 2022)"
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                  <input
+                    name="vehiclePlate"
+                    type="text"
+                    placeholder="Vehicle Plate Number"
+                    className="w-full px-6 py-3 border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                  />
+                </div>
                 <button
                   type="submit"
-                  className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                  className="w-full bg-black text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl active:scale-95 mt-6"
                 >
-                  Create Account
-                </button>
-              </form>
-
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-3 text-gray-600">Or continue with</span>
-                </div>
-              </div>
-
-              <form action={loginWithGoogle}>
-                <button
-                  type="submit"
-                  className="w-full border-2 border-black text-black font-semibold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  <span>Continue with Google</span>
+                  Register as Driver
                 </button>
               </form>
             </div>
           </div>
+
+          {/* Bottom Link */}
+          <div className="bg-gray-50 p-6 text-center border-t">
+            <a
+              href="/login"
+              className="text-black font-semibold hover:text-gray-600 transition-all duration-300 transform hover:scale-105 inline-block"
+            >
+              Are you a passenger? Sign in here →
+            </a>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slide-down {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulse-text {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+
+        .animate-slide-down {
+          animation: slide-down 0.4s ease-out;
+        }
+
+        .animate-shimmer {
+          animation: shimmer 3s infinite;
+        }
+
+        .animate-pulse-text {
+          animation: pulse-text 2s infinite;
+        }
+      `}</style>
     </div>
   )
 }
